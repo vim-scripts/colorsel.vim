@@ -4,8 +4,9 @@
 " Author: David Necas (Yeti) <yeti@physics.muni.cz>
 " URL: http://trific.ath.cx/Ftp/vim/scripts/colorsel.vim
 " License: This Vim script is in the public domain.
-" Version: 2004-03-03
-" Usage: After sourcing, do :ColorSel.  Keys:
+" Version: 2004-04-16
+" Usage: After sourcing, do :ColorSel (it accepts an optional rrggbb argument).
+" Keys:
 "   j, k  switch between channels (also: <up>, <down>)
 "   0, $  sets value to zero, maximum (also: <home>, <end>)
 "   h, l  increment/decrement by 1 (also: <left>, <right>)
@@ -13,8 +14,8 @@
 "   q     quits immediately
 "   y     yanks color in #rrggbb form to the unnamed register
 " Parameters:
-"   colorsel_swatch_size (number): vertical swatch size, do not set below 8
-"   colorsel_slider_size (number): slider size, longer sliders a need faster
+"   colorsel_swatch_size [number]: vertical swatch size, do not set below 8
+"   colorsel_slider_size [number]: slider size, longer sliders a need faster
 "                                  computer
 " Bugs: Must reload script to change parameters
 " TODO: Mouse support
@@ -425,9 +426,21 @@ function! s:activeDown()
   call s:drawStatus()
 endfun
 
-function! ColorSel()
+function! ColorSel(...)
+  " set color to rrggbb argument with optional # prefix
+  if a:0
+    let color = a:1[0] == '#' ? strpart(a:1, 1) : a:1
+    exe 'let s:red=0x'.   strpart(color, 0, 2)
+    exe 'let s:green=0x'. strpart(color, 2, 2)
+    exe 'let s:blue=0x'.  strpart(color, 4, 2)
+    call s:updateHSV()
+  endif
+
   if exists('s:bufno') && bufexists(s:bufno) && bufwinnr(s:bufno) > -1
     exec bufwinnr(s:bufno) . 'wincmd w'
+    if a:0
+      call s:update()
+    endif
     return
   endif
 
@@ -504,5 +517,5 @@ function! ColorSel()
   call s:update()
 endfun
 
-command! -nargs=0 ColorSel call ColorSel()
+command! -nargs=? ColorSel call ColorSel(<f-args>)
 " vim: set et ts=2 :
