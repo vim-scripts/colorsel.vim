@@ -4,7 +4,7 @@
 " Author: David Necas (Yeti) <yeti@physics.muni.cz>
 " URL: http://trific.ath.cx/Ftp/vim/scripts/colorsel.vim
 " License: This Vim script is in the public domain.
-" Version: 2004-04-16
+" Version: 2005-11-21
 " Usage: After sourcing, do :ColorSel (it accepts an optional rrggbb argument).
 " Keys:
 "   j, k  switch between channels (also: <up>, <down>)
@@ -417,12 +417,12 @@ function! s:active2line(a)
 endfun
 
 function! s:activeUp()
-  let s:active = 'rgbhsv' [(stridx('rgbhsv', s:active) + 5) % 6]
+  let s:active = 'rgbhsv'[(stridx('rgbhsv', s:active) + 5) % 6]
   call s:drawStatus()
 endfun
 
 function! s:activeDown()
-  let s:active = 'rgbhsv' [(stridx('rgbhsv', s:active) + 1) % 6]
+  let s:active = 'rgbhsv'[(stridx('rgbhsv', s:active) + 1) % 6]
   call s:drawStatus()
 endfun
 
