@@ -2,9 +2,8 @@
 " File: colorsel.vim
 " Summary: A simple interactive RGB/HSV color selector.
 " Author: David Necas (Yeti) <yeti@physics.muni.cz>
-" URL: http://trific.ath.cx/Ftp/vim/scripts/colorsel.vim
 " License: This Vim script is in the public domain.
-" Version: 2005-11-21
+" Version: 2009-04-28
 " Usage: After sourcing, do :ColorSel (it accepts an optional rrggbb argument).
 " Keys:
 "   j, k  switch between channels (also: <up>, <down>)
@@ -21,7 +20,7 @@
 " TODO: Mouse support
 
 if !has('gui_running')
-  echoerr 'Color selector needs GUI'
+  "echoerr 'Color selector needs GUI'
   finish
 endif
 
@@ -429,10 +428,178 @@ endfun
 function! ColorSel(...)
   " set color to rrggbb argument with optional # prefix
   if a:0
+    " remove # prefix
     let color = a:1[0] == '#' ? strpart(a:1, 1) : a:1
-    exe 'let s:red=0x'.   strpart(color, 0, 2)
-    exe 'let s:green=0x'. strpart(color, 2, 2)
-    exe 'let s:blue=0x'.  strpart(color, 4, 2)
+
+    " check if value is hexadecimally
+    let colorTmp = substitute(color, '[0-9A-F]', '', 'gi')
+    if strlen(colorTmp) > 0
+      " CSS color names (http://www.w3schools.com/css/css_colornames.asp)
+
+      if     color ==? 'AliceBlue'            | let color = 'F0F8FF'
+      elseif color ==? 'AntiqueWhite'         | let color = 'FAEBD7'
+      elseif color ==? 'Aqua'                 | let color = '00FFFF'
+      elseif color ==? 'Aquamarine'           | let color = '7FFFD4'
+      elseif color ==? 'Azure'                | let color = 'F0FFFF'
+      elseif color ==? 'Beige'                | let color = 'F5F5DC'
+      elseif color ==? 'Bisque'               | let color = 'FFE4C4'
+      elseif color ==? 'Black'                | let color = '000000'
+      elseif color ==? 'BlanchedAlmond'       | let color = 'FFEBCD'
+      elseif color ==? 'Blue'                 | let color = '0000FF'
+      elseif color ==? 'BlueViolet'           | let color = '8A2BE2'
+      elseif color ==? 'Brown'                | let color = 'A52A2A'
+      elseif color ==? 'BurlyWood'            | let color = 'DEB887'
+      elseif color ==? 'CadetBlue'            | let color = '5F9EA0'
+      elseif color ==? 'Chartreuse'           | let color = '7FFF00'
+      elseif color ==? 'Chocolate'            | let color = 'D2691E'
+      elseif color ==? 'Coral'                | let color = 'FF7F50'
+      elseif color ==? 'CornflowerBlue'       | let color = '6495ED'
+      elseif color ==? 'Cornsilk'             | let color = 'FFF8DC'
+      elseif color ==? 'Crimson'              | let color = 'DC143C'
+      elseif color ==? 'Cyan'                 | let color = '00FFFF'
+      elseif color ==? 'DarkBlue'             | let color = '00008B'
+      elseif color ==? 'DarkCyan'             | let color = '008B8B'
+      elseif color ==? 'DarkGoldenRod'        | let color = 'B8860B'
+      elseif color ==? 'DarkGray'             | let color = 'A9A9A9'
+      elseif color ==? 'DarkGreen'            | let color = '006400'
+      elseif color ==? 'DarkKhaki'            | let color = 'BDB76B'
+      elseif color ==? 'DarkMagenta'          | let color = '8B008B'
+      elseif color ==? 'DarkOliveGreen'       | let color = '556B2F'
+      elseif color ==? 'Darkorange'           | let color = 'FF8C00'
+      elseif color ==? 'DarkOrchid'           | let color = '9932CC'
+      elseif color ==? 'DarkRed'              | let color = '8B0000'
+      elseif color ==? 'DarkSalmon'           | let color = 'E9967A'
+      elseif color ==? 'DarkSeaGreen'         | let color = '8FBC8F'
+      elseif color ==? 'DarkSlateBlue'        | let color = '483D8B'
+      elseif color ==? 'DarkSlateGray'        | let color = '2F4F4F'
+      elseif color ==? 'DarkTurquoise'        | let color = '00CED1'
+      elseif color ==? 'DarkViolet'           | let color = '9400D3'
+      elseif color ==? 'DeepPink'             | let color = 'FF1493'
+      elseif color ==? 'DeepSkyBlue'          | let color = '00BFFF'
+      elseif color ==? 'DimGray'              | let color = '696969'
+      elseif color ==? 'DodgerBlue'           | let color = '1E90FF'
+      elseif color ==? 'FireBrick'            | let color = 'B22222'
+      elseif color ==? 'FloralWhite'          | let color = 'FFFAF0'
+      elseif color ==? 'ForestGreen'          | let color = '228B22'
+      elseif color ==? 'Fuchsia'              | let color = 'FF00FF'
+      elseif color ==? 'Gainsboro'            | let color = 'DCDCDC'
+      elseif color ==? 'GhostWhite'           | let color = 'F8F8FF'
+      elseif color ==? 'Gold'                 | let color = 'FFD700'
+      elseif color ==? 'GoldenRod'            | let color = 'DAA520'
+      elseif color ==? 'Gray'                 | let color = '808080'
+      elseif color ==? 'Green'                | let color = '008000'
+      elseif color ==? 'GreenYellow'          | let color = 'ADFF2F'
+      elseif color ==? 'HoneyDew'             | let color = 'F0FFF0'
+      elseif color ==? 'HotPink'              | let color = 'FF69B4'
+      elseif color ==? 'IndianRed'            | let color = 'CD5C5C'
+      elseif color ==? 'Indigo'               | let color = '4B0082'
+      elseif color ==? 'Ivory'                | let color = 'FFFFF0'
+      elseif color ==? 'Khaki'                | let color = 'F0E68C'
+      elseif color ==? 'Lavender'             | let color = 'E6E6FA'
+      elseif color ==? 'LavenderBlush'        | let color = 'FFF0F5'
+      elseif color ==? 'LawnGreen'            | let color = '7CFC00'
+      elseif color ==? 'LemonChiffon'         | let color = 'FFFACD'
+      elseif color ==? 'LightBlue'            | let color = 'ADD8E6'
+      elseif color ==? 'LightCoral'           | let color = 'F08080'
+      elseif color ==? 'LightCyan'            | let color = 'E0FFFF'
+      elseif color ==? 'LightGoldenRodYellow' | let color = 'FAFAD2'
+      elseif color ==? 'LightGrey'            | let color = 'D3D3D3'
+      elseif color ==? 'LightGreen'           | let color = '90EE90'
+      elseif color ==? 'LightPink'            | let color = 'FFB6C1'
+      elseif color ==? 'LightSalmon'          | let color = 'FFA07A'
+      elseif color ==? 'LightSeaGreen'        | let color = '20B2AA'
+      elseif color ==? 'LightSkyBlue'         | let color = '87CEFA'
+      elseif color ==? 'LightSlateGray'       | let color = '778899'
+      elseif color ==? 'LightSteelBlue'       | let color = 'B0C4DE'
+      elseif color ==? 'LightYellow'          | let color = 'FFFFE0'
+      elseif color ==? 'Lime'                 | let color = '00FF00'
+      elseif color ==? 'LimeGreen'            | let color = '32CD32'
+      elseif color ==? 'Linen'                | let color = 'FAF0E6'
+      elseif color ==? 'Magenta'              | let color = 'FF00FF'
+      elseif color ==? 'Maroon'               | let color = '800000'
+      elseif color ==? 'MediumAquaMarine'     | let color = '66CDAA'
+      elseif color ==? 'MediumBlue'           | let color = '0000CD'
+      elseif color ==? 'MediumOrchid'         | let color = 'BA55D3'
+      elseif color ==? 'MediumPurple'         | let color = '9370D8'
+      elseif color ==? 'MediumSeaGreen'       | let color = '3CB371'
+      elseif color ==? 'MediumSlateBlue'      | let color = '7B68EE'
+      elseif color ==? 'MediumSpringGreen'    | let color = '00FA9A'
+      elseif color ==? 'MediumTurquoise'      | let color = '48D1CC'
+      elseif color ==? 'MediumVioletRed'      | let color = 'C71585'
+      elseif color ==? 'MidnightBlue'         | let color = '191970'
+      elseif color ==? 'MintCream'            | let color = 'F5FFFA'
+      elseif color ==? 'MistyRose'            | let color = 'FFE4E1'
+      elseif color ==? 'Moccasin'             | let color = 'FFE4B5'
+      elseif color ==? 'NavajoWhite'          | let color = 'FFDEAD'
+      elseif color ==? 'Navy'                 | let color = '000080'
+      elseif color ==? 'OldLace'              | let color = 'FDF5E6'
+      elseif color ==? 'Olive'                | let color = '808000'
+      elseif color ==? 'OliveDrab'            | let color = '6B8E23'
+      elseif color ==? 'Orange'               | let color = 'FFA500'
+      elseif color ==? 'OrangeRed'            | let color = 'FF4500'
+      elseif color ==? 'Orchid'               | let color = 'DA70D6'
+      elseif color ==? 'PaleGoldenRod'        | let color = 'EEE8AA'
+      elseif color ==? 'PaleGreen'            | let color = '98FB98'
+      elseif color ==? 'PaleTurquoise'        | let color = 'AFEEEE'
+      elseif color ==? 'PaleVioletRed'        | let color = 'D87093'
+      elseif color ==? 'PapayaWhip'           | let color = 'FFEFD5'
+      elseif color ==? 'PeachPuff'            | let color = 'FFDAB9'
+      elseif color ==? 'Peru'                 | let color = 'CD853F'
+      elseif color ==? 'Pink'                 | let color = 'FFC0CB'
+      elseif color ==? 'Plum'                 | let color = 'DDA0DD'
+      elseif color ==? 'PowderBlue'           | let color = 'B0E0E6'
+      elseif color ==? 'Purple'               | let color = '800080'
+      elseif color ==? 'Red'                  | let color = 'FF0000'
+      elseif color ==? 'RosyBrown'            | let color = 'BC8F8F'
+      elseif color ==? 'RoyalBlue'            | let color = '4169E1'
+      elseif color ==? 'SaddleBrown'          | let color = '8B4513'
+      elseif color ==? 'Salmon'               | let color = 'FA8072'
+      elseif color ==? 'SandyBrown'           | let color = 'F4A460'
+      elseif color ==? 'SeaGreen'             | let color = '2E8B57'
+      elseif color ==? 'SeaShell'             | let color = 'FFF5EE'
+      elseif color ==? 'Sienna'               | let color = 'A0522D'
+      elseif color ==? 'Silver'               | let color = 'C0C0C0'
+      elseif color ==? 'SkyBlue'              | let color = '87CEEB'
+      elseif color ==? 'SlateBlue'            | let color = '6A5ACD'
+      elseif color ==? 'SlateGray'            | let color = '708090'
+      elseif color ==? 'Snow'                 | let color = 'FFFAFA'
+      elseif color ==? 'SpringGreen'          | let color = '00FF7F'
+      elseif color ==? 'SteelBlue'            | let color = '4682B4'
+      elseif color ==? 'Tan'                  | let color = 'D2B48C'
+      elseif color ==? 'Teal'                 | let color = '008080'
+      elseif color ==? 'Thistle'              | let color = 'D8BFD8'
+      elseif color ==? 'Tomato'               | let color = 'FF6347'
+      elseif color ==? 'Turquoise'            | let color = '40E0D0'
+      elseif color ==? 'Violet'               | let color = 'EE82EE'
+      elseif color ==? 'Wheat'                | let color = 'F5DEB3'
+      elseif color ==? 'White'                | let color = 'FFFFFF'
+      elseif color ==? 'WhiteSmoke'           | let color = 'F5F5F5'
+      elseif color ==? 'Yellow'               | let color = 'FFFF00'
+      elseif color ==? 'YellowGreen'          | let color = '9ACD32'
+
+      else
+        "echoerr "Wrong color value '".color."'!"
+        let color = '000'
+      endif
+    endif
+
+    " color value is hexadecimally and short (000)
+    if strlen(color) == 3
+      exe 'let s:red=0x'.   strpart(color, 0, 1).strpart(color, 0, 1)
+      exe 'let s:green=0x'. strpart(color, 1, 1).strpart(color, 1, 1)
+      exe 'let s:blue=0x'.  strpart(color, 2, 1).strpart(color, 2, 1)
+    " color value is hexadecimally and long (000000)
+    elseif strlen(color) == 6
+      exe 'let s:red=0x'.   strpart(color, 0, 2)
+      exe 'let s:green=0x'. strpart(color, 2, 2)
+      exe 'let s:blue=0x'.  strpart(color, 4, 2)
+    else
+      "echoerr "Wrong color value '".color."'!"
+      exe 'let s:red=0x'.   '00'
+      exe 'let s:green=0x'. '00'
+      exe 'let s:blue=0x'.  '00'
+    endif
+
     call s:updateHSV()
   endif
 
