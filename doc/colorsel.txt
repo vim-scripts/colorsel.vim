@@ -21,14 +21,19 @@ color display).
 ==============================================================================
 USAGE							      *colorsel-usage*
 
-:ColorSel [{rrbbgg}|{colorname}] [{rrbbgg}|{fgcolorname}]
+:ColorSel [{rrbbgg}|{color-name} [{rrbbgg}|{color-name}]]
 
-The command accepts one or two optional {rrggbb} or {colorname} arguments.
+The command accepts one or two optional {rrggbb} or {color-name} arguments.
 The second one will become the reference (alternate) or foreground/background
 color that is not currently being edited if specified. One can also keep an
 existing color by passing '.', '-' or '*' in its place, so for example use >
     :ColorSel . White
 to set the foreground color to white.
+
+:ColorSel [guifg={color-name}] [guibg={color-name}]
+
+When editing a Vim highlighting or colorscheme, you can directly pass the
+(previously yanked) |guifg| and |guibg| |highlight-gui| arguments. 
 
 :ColorSel {hlgroup-name}
 
@@ -40,7 +45,7 @@ foreground and background color, and "f" to change the "gui" attribute (bold
 and italic attributes are supported). Any changes are applied "live" to the
 highlight group, so you can easily preview your changes if you have another
 buffer opened which has the corresponding syntax highlightings. You can still
-update the colors via :ColorSel {colorname} commands; the link to the
+update the colors via :ColorSel {color-name} commands; the link to the
 highlight group will only be broken when you close the color selector window
 (e.g. via "q").
 

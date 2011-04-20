@@ -4,7 +4,7 @@
 " Authors: David Necas (Yeti) <yeti@physics.muni.cz>
 "          Ingo Karkat <swdev@ingo-karkat.de>
 " License: This Vim script is in the public domain.
-" Version: 2010-04-01
+" Version: 2011-01-07
 
 let s:swatchSize = exists('colorsel_swatch_size') ? colorsel_swatch_size : 10
 let s:swatchSize = s:swatchSize < 6 ? 6 : s:swatchSize
@@ -857,6 +857,31 @@ function! colorsel#ColorSel(...)
       let isSetAltColor = 1
     elseif a:1 =~ '^[-.*]$'
       " Background color should be kept as-is.
+    elseif a:1 =~ '^guifg='
+      let guicolor=strpart(a:1, 6)
+      let fgcolor = s:translateColorWithCheck(guicolor, "Invalid color value '".guicolor."'.")
+      if fgcolor != ''
+        let s:isForegroundSwapped = 0 " Stop swapping, this definitely is the foreground color. 
+
+        " Set background to default Vim background; this may be overridden if
+        " the bgcolor is specified as the second argument. 
+        call s:setColor(&background ==? 'light' ? 'ffffff' : '000000')
+
+        let s:altColor = fgcolor
+        let isSetAltColor = 1
+
+        if a:0 == 1
+          " No "guibg=..." is passed; edit the foreground color.
+          call s:toggleForegroundEditing()
+        endif
+      endif
+    elseif a:1 =~ '^guibg='
+      let guicolor=strpart(a:1, 6)
+      let bgcolor = s:translateColorWithCheck(guicolor, "Invalid color value '".guicolor."'.")
+      if bgcolor != ''
+        let s:isForegroundSwapped = 0 " Stop swapping, this definitely is the background color. 
+        call s:setColor(bgcolor)
+      endif
     else
       let bgcolor = s:translateColorWithCheck(a:1, "Invalid color value '".a:1."'.")
       if bgcolor != ''
@@ -867,6 +892,20 @@ function! colorsel#ColorSel(...)
     if a:0 > 1
       if a:2 =~ '^[-.*]$'
         " Foreground color should be kept as-is.
+      elseif a:2 =~ '^guifg='
+        let guicolor=strpart(a:2, 6)
+        let fgcolor = s:translateColorWithCheck(guicolor, "Invalid color value '".guicolor."'.")
+        if fgcolor != ''
+          let s:isForegroundSwapped = 0 " Stop swapping, this definitely is the foreground color. 
+          let s:altColor = fgcolor
+        endif
+      elseif a:2 =~ '^guibg='
+        let guicolor=strpart(a:2, 6)
+        let bgcolor = s:translateColorWithCheck(guicolor, "Invalid color value '".guicolor."'.")
+        if bgcolor != ''
+          let s:isForegroundSwapped = 0 " Stop swapping, this definitely is the background color. 
+          call s:setColor(bgcolor)
+        endif
       else
         let fgcolor = s:translateColorWithCheck(a:2, "Invalid color value '".a:2."'.")
         if fgcolor != ''
@@ -894,11 +933,15 @@ function! colorsel#ColorSel(...)
   if ! isSetHlGroup
     let s:hlgroup = '' " Break the link to an existing highlight group, unless a hlgroup was passed as the argument.
   endif
-  exec 'silent split ' . s:bufname
-  if !exists('s:bufno') || !bufexists(s:bufno)
-    let s:bufno = bufnr('%')
+
+  if exists('s:bufno') && bufexists(s:bufno)
+    exec 'silent' s:bufno . 'sbuf'
+  else
+    exec 'silent split ' . s:bufname
   endif
-  setlocal buftype=nowrite
+  let s:bufno = bufnr('%')
+
+  setlocal buftype=nofile
   setlocal bufhidden=delete
   setlocal nolist
   setlocal noswapfile
